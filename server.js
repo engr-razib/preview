@@ -37,27 +37,15 @@ app.post('/api/generate-preview', async (req, res) => {
 
     try {
         const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL;
-        let launchOptions = {};
 
-        if (isProd) {
-            // Vercel / Production Settings
-            launchOptions = {
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-            };
-        } else {
-            // Local Windows Settings
-            // This uses your locally installed Chrome browser
-            launchOptions = {
-                args: ['--no-sandbox'],
-                executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Standard Windows path
-                headless: true,
-            };
-        }
-
-        browser = await puppeteer.launch(launchOptions);
+        browser = await puppeteer.launch({
+            args: isProd ? chromium.args : ['--no-sandbox'],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: isProd 
+                ? await chromium.executablePath() 
+                : 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Update this path for your local machine
+            headless: isProd ? chromium.headless : true,
+        });
 
           
         const page = await browser.newPage();
@@ -155,5 +143,6 @@ if (process.env.NODE_ENV !== 'production') {
     const PORT = 3000;
     app.listen(PORT, () => console.log(`Local server running at http://localhost:${PORT}`));
 }
+
 
 module.exports = app;
