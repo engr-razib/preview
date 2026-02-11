@@ -4,6 +4,7 @@ const chromium = require('@sparticuz/chromium');
 const cors = require('cors');
 const path = require('path');
 const app = express();
+const isProd = true;
 
 app.use(express.json({ limit: '100mb' }));
 app.use(cors());
@@ -36,7 +37,9 @@ app.post('/api/generate-preview', async (req, res) => {
     let browser = null;
 
     try {
-        const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+        // const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL;
+
+        
 
         browser = await puppeteer.launch({
             args: isProd ? chromium.args : ['--no-sandbox'],
@@ -139,10 +142,11 @@ app.post('/api/generate-preview', async (req, res) => {
 
 
 // For Vercel, we export the app; for local, we listen
-if (process.env.NODE_ENV !== 'production') {
+if (!isProd) {
     const PORT = 3000;
     app.listen(PORT, () => console.log(`Local server running at http://localhost:${PORT}`));
 }
 
 
 module.exports = app;
+
