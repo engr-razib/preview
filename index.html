@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ultimate Bulk Ad Mockup Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1a73e8;
+            margin-top: 0;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 15px 0;
+            color: #444;
+        }
+
+        textarea,
+        select,
+        button,
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .size-config-container {
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fafafa;
+            margin-bottom: 20px;
+        }
+
+        .size-row {
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 0.5fr;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .btn-add {
+            background: #34a853;
+            color: white;
+            border: none;
+            margin-bottom: 10px;
+            width: auto;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .btn-remove {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 8px;
+            width: auto;
+            cursor: pointer;
+        }
+
+        .btn-main {
+            background: #1a73e8;
+            color: white;
+            height: 50px;
+            font-size: 16px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .radio-item input {
+            width: auto;
+            margin: 0;
+        }
+
+        #loading-status {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            background: #e8f0fe;
+            margin-top: 20px;
+            color: #1967d2;
+            font-weight: bold;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a73e8;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h2>Bulk Mockup Generator</h2>
+
+        <label>1. Target Website URLs (One per line)</label>
+        <textarea id="targetUrls" placeholder="https://yahoo.com">https://www.prothomalo.com/
+https://finance.yahoo.com/
+        </textarea>
+
+        <label>2. Configure Banners & Upload Images</label>
+        <div id="config-area" class="size-config-container">
+            <button type="button" class="btn-add" onclick="addSizeRow()">+ Add Another Banner Size</button>
+            <div class="size-row">
+                <select class="banner-size">
+                    <optgroup label="Standard Display Banners">
+                        <option value="300x250" selected>Medium Rectangle (300x250)</option>
+                        <option value="728x90">Leaderboard (728x90)</option>
+                        <option value="300x600">Half Page / Skyscraper (300x600)</option>
+                        <option value="970x250">Billboard (970x250)</option>
+                    </optgroup>
+                    <optgroup label="Header / Top Banner">
+                        <option value="970x250">Billboard (970x250)</option>
+                        <option value="970x90">Large Leaderboard (970x90)</option>
+                        <option value="728x90">Leaderboard (728x90)</option>
+                    </optgroup>
+                    <optgroup label="Homepage Hero">
+                        <option value="1200x400">Hero Large (1200x400)</option>
+                        <option value="1140x350">Hero Mid (1140x350)</option>
+                        <option value="1000x300">Hero Small (1000x300)</option>
+                    </optgroup>
+                    <optgroup label="Sidebar / Column">
+                        <option value="300x600">Half Page (300x600)</option>
+                        <option value="300x250">Medium Rectangle (300x250)</option>
+                        <option value="250x250">Square (250x250)</option>
+                    </optgroup>
+                    <optgroup label="In-Article / Content">
+                        <option value="336x280">Large Rectangle (336x280)</option>
+                        <option value="468x60">Classic Banner (468x60)</option>
+                        <option value="320x100">Mobile Content (320x100)</option>
+                    </optgroup>
+                    <optgroup label="Mobile News">
+                        <option value="320x50">Mobile Leaderboard (320x50)</option>
+                        <option value="300x250">Mobile Medium Rect (300x250)</option>
+                        <option value="320x100">Mobile Large (320x100)</option>
+                    </optgroup>
+                </select>
+                <input type="file" class="ad-file" accept="image/*">
+                <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            </div>
+
+        </div>
+
+        <label>3. Generation Mode</label>
+        <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="genMode" value="single" checked> Individual
+                Files</label>
+            <label class="radio-item"><input type="radio" name="genMode" value="all"> All-in-One Page</label>
+        </div>
+
+        <div id="loading-status" class="hidden">
+            <div class="loader"></div> <span id="status-text">Processing...</span>
+        </div>
+
+        <button id="btn-html" class="btn-main" onclick="generateBulk('html')">Generate & Download ZIP</button>
+    </div>
+
+    <script>
+        function addSizeRow() {
+            const configArea = document.getElementById('config-area');
+            const firstRow = document.querySelector('.size-row');
+            const newRow = firstRow.cloneNode(true);
+            newRow.querySelector('input').value = "";
+            configArea.appendChild(newRow);
+        }
+
+        async function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function generateBulk(type) {
+            const urls = document.getElementById('targetUrls').value.trim().split('\n').filter(u => u);
+            const rows = document.querySelectorAll('.size-row');
+            const zip = new JSZip();
+            const statusText = document.getElementById('status-text');
+            const mode = document.querySelector('input[name="genMode"]:checked').value;
+
+            if (!urls.length) return alert("Please enter at least one URL");
+            toggleLoading(true);
+
+            try {
+                for (const url of urls) {
+                    const siteName = new URL(url.trim()).hostname.replace('www.', '').split('.')[0];
+                    const folder = zip.folder(siteName);
+
+                    if (mode === 'all') {
+                        // Gather all banners for this site
+                        const banners = [];
+                        for (const row of rows) {
+                            const size = row.querySelector('.banner-size').value;
+                            const file = row.querySelector('.ad-file').files[0];
+                            if (!file) continue;
+                            const [w, h] = size.split('x');
+                            banners.push({ img: await toBase64(file), w: parseInt(w), h: parseInt(h), label: size });
+                        }
+
+                        statusText.innerText = `Processing All-in-One for ${siteName}...`;
+                        const res = await fetch('/api/generate-preview', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ targetUrl: url.trim(), banners, type, mode: 'all' })
+                        });
+                        const blob = await res.blob();
+                        folder.file(`all_banners_mockup.html`, blob);
+
+                    } else {
+                        // Individual processing
+                        for (const row of rows) {
+                            const size = row.querySelector('.banner-size').value;
+                            const file = row.querySelector('.ad-file').files[0];
+                            if (!file) continue;
+                            const [w, h] = size.split('x');
+                            const base64 = await toBase64(file);
+
+                            statusText.innerText = `Site: ${siteName} | Size: ${size}...`;
+                            const res = await fetch('/api/generate-preview', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ targetUrl: url.trim(), adImageUrl: base64, adWidth: parseInt(w), adHeight: parseInt(h), type, mode: 'single' })
+                            });
+                            const blob = await res.blob();
+                            folder.file(`${size}_mockup.html`, blob);
+                        }
+                    }
+                }
+
+                const content = await zip.generateAsync({ type: "blob" });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(content);
+                link.download = `Mockups_${Date.now()}.zip`;
+                link.click();
+            } catch (err) {
+                console.error(err);
+                alert("Error generating mockups.");
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        function toggleLoading(isLoading) {
+            document.getElementById('loading-status').classList.toggle('hidden', !isLoading);
+            document.querySelectorAll('button').forEach(b => b.disabled = isLoading);
+        }
+    </script>
+</body>
+
+</html>
